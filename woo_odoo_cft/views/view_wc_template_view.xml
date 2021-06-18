@@ -1,0 +1,233 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        <record id="wc_product_tree_view" model="ir.ui.view">
+            <field name="name">WooCommerce Product Tree View</field>
+            <field name="model">wc.product.template.cft</field>
+            <field name="arch" type="xml">
+                <tree string="WooCommerce Product Tree View" create="false">
+                    <field name="name"/>
+                    <field name="wc_instance_id"/>
+                    <field name="product_tmpl_id"/>
+                    <field name="wc_categ_ids"/>
+                    <field name="wc_tmpl_id"/>
+                    <field name="total_variants"/>
+                    <field name="total_sync_variants"/>
+                    <field name="avail_in_wc"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="wc_product_search_view">
+            <field name="name">WooCommerce Product Search View</field>
+            <field name="model">wc.product.template.cft</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="Product" filter_domain="[('name','ilike',self)]"/>
+                    <field name="product_tmpl_id"/>
+                    <field name="wc_tmpl_id"/>
+                    <filter string="Available in WooCommerce" name="wc_avail"
+                            domain="[('avail_in_wc','=',True)]"/>
+                    <filter string="Not Available in WooCommerce" name="wc_un_avail"
+                            domain="[('avail_in_wc','=',False)]"/>
+                    <group string="Group By">
+                        <filter string="Instance" name="Instance" context="{'group_by':'wc_instance_id'}"/>
+                        <filter string="Template" name="Template" context="{'group_by':'product_tmpl_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="wc_product_form_view" model="ir.ui.view">
+            <field name="name">WooCommerce Product Form View</field>
+            <field name="model">wc.product.template.cft</field>
+            <field name="arch" type="xml">
+                <form string="WooCommerce Product Form View" create="false">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="wc_published" class="oe_stat_button" type="object" icon="fa-cloud-upload"
+                                    attrs="{'invisible': ['|',('avail_in_wc','=',False),('website_published','=',True)]}">
+                                <span class="text-success">Publish Product</span>
+                            </button>
+                            <button name="wc_unpublished" class="oe_stat_button" type="object" icon="fa-cloud-download"
+                                    attrs="{'invisible': ['|',('avail_in_wc','=',False),('website_published','=',False)]}">
+                                <span class="text-danger">Unpublish Product</span>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Title"/>
+                            <h1>
+                                <field name="name" class="oe_inline"/>
+                            </h1>
+                        </div>
+                        <field name="website_published" invisible="1"/>
+
+                        <notebook>
+                            <page string="General Information">
+                                <group>
+                                    <group>
+                                        <field name="wc_instance_id" domain="[('state','=','confirm')]"
+                                               attrs="{'readonly': [('avail_in_wc','=',True)]}"/>
+                                        <field name="product_tmpl_id" required="1" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="wc_categ_ids" domain="[('wc_instance_id','=',wc_instance_id)]"
+                                               widget="many2many_tags"/>
+                                        <field name="wc_tag_ids" domain="[('wc_instance_id','=',wc_instance_id)]"
+                                               widget="many2many_tags"/>
+                                    </group>
+                                    <group>
+                                        <field name="created_at" readonly="1"/>
+                                        <field name="updated_at" readonly="1"/>
+                                        <field name="avail_in_wc" readonly="1"/>
+                                        <field name="taxable"/>
+                                    </group>
+                                    <group>
+                                        <field name="wc_tmpl_id" readonly="1"/>
+                                        <field name="total_variants" readonly="1"/>
+                                        <field name="total_sync_variants"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Notes">
+                                <group string="Description">
+                                    <field name="description" nolabel="1"/>
+                                </group>
+                                <group string="Short Description">
+                                    <field name="short_description" nolabel="1"/>
+                                </group>
+                            </page>
+                            <page string="Variants">
+                                <group>
+                                    <field name="wc_product_ids" nolabel="1"/>
+                                </group>
+                            </page>
+                            <page string="Gallery Images">
+                                <group>
+                                    <field name="wc_gallery_image_ids" nolabel="1" mode="kanban">
+                                        <kanban class="o_res_partner_kanban">
+                                            <templates>
+                                                <field name="image"></field>
+                                                <t t-name="kanban-box">
+                                                    <div class="oe_kanban_global_click">
+                                                        <a title="Delete" t-if="!read_only_mode" type="delete"
+                                                           class="fa fa-times pull-right"/>
+                                                        <div class="o_kanban_image "
+                                                             style="box-shadow: 2px 2px 10px #888888;">
+                                                            <img alt="Product Image" t-if="record.image.raw_value"
+                                                                 t-att-src="'data:image/png;base64,'+record.image.raw_value"
+                                                                 style="heigh:50px;width:50px;"/>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </templates>
+                                        </kanban>
+                                    </field>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wc_product" model="ir.actions.act_window">
+            <field name="name">WooCommerce Product</field>
+            <field name="res_model">wc.product.template.cft</field>
+            <field name="view_id" ref="wc_product_tree_view"/>
+            <field name="help" type="html">
+                <div>
+                    <p>
+                        <b>WooCommerce products not available yet</b>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <record id="wc_view_inventory_filter" model="ir.ui.view">
+            <field name="name">stock.inventory.filter</field>
+            <field name="model">stock.inventory</field>
+            <field name="arch" type="xml">
+                <search string="Search Inventory">
+                    <field name="name" string="Inventory Reference"/>
+                    <field name="date"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="product_ids" string="Product"
+                           filter_domain="['|', ('product_ids', 'ilike', self), ('line_ids.product_id','ilike',self)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Status" name="status" context="{'group_by':'state'}"/>
+                        <filter string="WooCommerce Instance" name="instance" context="{'group_by':'wc_instance_id'}"/>
+                        <filter string="Inventories Month" name="inventory_month" context="{'group_by':'date'}"
+                                help="Physical Inventories by Month"/>
+                    </group>
+                </search>
+
+            </field>
+        </record>
+
+        <record id="wc_view_inventory_tree" model="ir.ui.view">
+            <field name="name">stock.inventory.tree</field>
+            <field name="model">stock.inventory</field>
+            <field name="arch" type="xml">
+                <tree string="Lot/Serial Number Inventory" decoration-muted="state == 'cancel'">
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="state"/>
+                    <field name="wc_instance_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_wc_inv_adj" model="ir.actions.act_window">
+            <field name="name">WooCommerce Inventory Adjustment</field>
+            <field name="res_model">stock.inventory</field>
+            <field name="view_id" ref="wc_view_inventory_tree"/>
+            <field name="search_view_id" ref="wc_view_inventory_filter"/>
+            <field name="domain">[('wc_instance_id','!=',False)]</field>
+            <field name="help" type="html">
+                <div>
+                    <p>
+                        <b>WooCommerce Inventory Adjustment not available yet</b>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <menuitem id="menu_item_parent_wc_products" name="Catalog"
+                  parent="wc_main_menu" sequence="8"/>
+
+        <menuitem id="menu_item_wc_products" name="Products"
+                  parent="menu_item_parent_wc_products" sequence="3"
+                  action="action_wc_product"/>
+
+        <menuitem id="menu_item_wc_inv_adj" name="Inventory Adjustment"
+                  parent="menu_item_parent_wc_products" sequence="15"
+                  action="action_wc_inv_adj"/>
+
+        <record id="act_wc_template" model="ir.actions.act_window">
+            <field name="name">WooCommerce Template</field>
+            <field name="res_model">wc.product.template.cft</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('product_tmpl_id','=',active_id)]</field>
+            <field name="context">{'search_default_product_tmpl_id': active_id}</field>
+        </record>
+
+        <record id="product_template_wc_button" model="ir.ui.view">
+            <field name="name">product.template.wc.button</field>
+            <field name="model">product.template</field>
+            <field name="priority">55</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" name="%(act_wc_template)d" type="action"
+                            attrs="{'invisible':[('type', '=', 'service')]}" icon="fa-external-link"
+                            help="WooCommerce Templates" groups="woo_odoo_cft.group_wc">
+                        <field string="WooCommerce Templates" name="wc_template_count" groups="woo_odoo_cft.group_wc"
+                               widget="statinfo"/>
+                    </button>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

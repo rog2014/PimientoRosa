@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_wc_categs_form_view" model="ir.ui.view">
+            <field name="name">WooCommerce categs</field>
+            <field name="model">wc.category.cft</field>
+            <field name="arch" type="xml">
+                <form string="WooCommerce Categories">
+                    <sheet>
+                        <field name="image" widget="image" class="oe_avatar oe_left" nolabel="1"/>
+                        <div class="oe_title oe_left" style="width: 500px;">
+                            <h1>
+                                <field name="name" required="1" default_focus="1" placeholder="Name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="wc_instance_id" domain="[('state','=','confirm')]"/>
+                                <field name="parent_id" domain="[('wc_instance_id','=',wc_instance_id)]"/>
+                            </group>
+                            <group>
+                                <field name="display"/>
+                                <field name="slug"/>
+                                <field name="wc_categ_id"/>
+                                <field name="avail_in_wc"/>
+                            </group>
+                        </group>
+                        <group string="Description">
+                            <field name="description" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="product_wc_categs_tree_view" model="ir.ui.view">
+            <field name="name">WooCommerce Category</field>
+            <field name="model">wc.category.cft</field>
+            <field name="arch" type="xml">
+                <tree string="Product Product Categories">
+                    <field name="name"/>
+                    <field name="slug"/>
+                    <field name="parent_id"/>
+                    <field name="wc_instance_id"/>
+                    <field name="avail_in_wc"/>
+                    <field name="wc_categ_id"/>
+                </tree>
+            </field>
+        </record>
+        <record id="product_wc_categs_search_view" model="ir.ui.view">
+            <field name="name">WooCommerce Categ Search View</field>
+            <field name="model">wc.category.cft</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="WooCommerce Category">
+                    <field name="name"/>
+                    <field name="wc_categ_id"/>
+                    <filter string="Available in WooCommerce" name="avail"
+                            domain="[('avail_in_wc','=','True')]"/>
+                    <filter string="Not Available in WooCommerce" name="not_avail"
+                            domain="[('avail_in_wc','=','False')]"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Instance" name="instance" context="{'group_by':'wc_instance_id'}"/>
+                        <filter string="Display" name="display" context="{'group_by':'display'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="product_categ_action" model="ir.actions.act_window">
+            <field name="name">Product Categories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wc.category.cft</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="product_categ_instance_action" model="ir.actions.act_window">
+            <field name="name">Product Categories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wc.category.cft</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('wc_instance_id','=',active_id)]</field>
+        </record>
+
+        <menuitem action="product_categ_action" id="menu_product_categ" parent="menu_item_parent_wc_products"
+                  sequence="10"/>
+    </data>
+</odoo>

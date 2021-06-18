@@ -1,0 +1,446 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+
+        <record id="wc_instance_tree_view" model="ir.ui.view">
+            <field name="name">WooCommerce Instance</field>
+            <field name="model">wc.instance.cft</field>
+            <field name="arch" type="xml">
+                <tree string="WooCommerce Instance">
+                    <field name="name"/>
+                    <field name="website_url"/>
+                    <field name="wc_version"/>
+                    <field name="verify_ssl"/>
+                    <field name="warehouse_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="wc_instance_form_view" model="ir.ui.view">
+            <field name="name">WooCommerce Instance</field>
+            <field name="model">wc.instance.cft</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="button_reset" string="Reset Instance"
+                                type="object" states="confirm"
+                                groups="woo_odoo_cft.group_wc_manager" class="btn btn-primary"/>
+                        <button name="button_connect" string="Connect Instance"
+                                type="object" states="draft"
+                                groups="woo_odoo_cft.group_wc_manager" class="btn btn-primary"/>
+                        <button name="button_confirm" string="Confirm Instance"
+                                type="object" states="connect"
+                                groups="woo_odoo_cft.group_wc_manager" class="btn btn-primary"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="import_basic_info" icon="fa-info-circle"
+                                    type="object" states="connect,confirm"
+                                    groups="woo_odoo_cft.group_wc_manager" class="oe_stat_button">
+                                <span>Import Basic Info</span>
+                            </button>
+                        </div>
+                        <div class="oe_left" style="width: 500px;">
+                            <div class="oe_title" style="width: 390px;">
+                                <label class="oe_edit_only" for="name" string="Name"/>
+                                <h1>
+                                    <field name="name" class="oe_inline"
+                                           attrs="{'readonly':[('state','in','confirm')]}"/>
+                                </h1>
+                            </div>
+                        </div>
+                        <group groups="woo_odoo_cft.group_wc_manager">
+                            <group>
+                                <field name="website_url" placeholder="http://example.com"
+                                       attrs="{'readonly':[('state','in','confirm')]}"/>
+                                <field name="consumer_key"
+                                       attrs="{'readonly':[('state','in','confirm')]}"/>
+                                <field name="consumer_secret"
+                                       attrs="{'readonly':[('state','in','confirm')]}"/>
+                            </group>
+                            <group>
+                                <field name="wc_version" required="1"
+                                       attrs="{'readonly':[('state','in','confirm')]}" id='wc_version'/>
+                                <field name="verify_ssl"
+                                       attrs="{'readonly':[('state','in','confirm')]}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="wc_username" required="1"
+                                       attrs="{'readonly':[('state','in','confirm')]}"/>
+                            </group>
+                            <group>
+                                <field name="wc_password" required="1" password="1"
+                                       attrs="{'readonly':[('state','in','confirm')]}"/>
+                            </group>
+                        </group>
+                        <notebook attrs="{'invisible':[('state','=','draft')]}">
+                            <page string="Configuration">
+                                <group>
+                                    <group>
+                                        <field name="attribute_type"
+                                               attrs="{'required':[('state','!=','draft')]}"/>
+                                        <field name="auto_create_product"/>
+                                    </group>
+                                    <group>
+                                        <field name="company_id"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"
+                                               groups="base.group_multi_company"
+                                               attrs="{'required':[('state','!=','draft')]}"/>
+                                        <field name="lang_id"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"
+                                               attrs="{'required':[('state','!=','draft')]}"/>
+                                        <field name="warehouse_id"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"
+                                               attrs="{'required':[('state','!=','draft')]}"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Orders" groups="woo_odoo_cft.group_wc_manager">
+                                <group>
+                                    <group>
+                                        <field name="id" invisible="1"/>
+                                        <field name="import_order_status_ids"
+                                               attrs="{'required':[('state','!=','draft')]}"
+                                               domain="[('wc_instance_id','=',id)]" widget="many2many_tags"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"/>
+                                        <field name="import_order_after"
+                                               attrs="{'required':[('state','!=','draft')]}"/>
+                                        <field name="team_id"
+                                               attrs="{'required':[('state','!=','draft')]}"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"/>
+                                        <field name="payment_term_id"
+                                               attrs="{'required':[('state','!=','draft')]}"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"/>
+                                        <field name="discount_line_product_id"
+                                               domain="[('type','=','service')]"
+                                               attrs="{'required':[('state','!=','draft')]}"/>
+                                        <field name="fee_line_product_id"
+                                               attrs="{'required':[('state','!=','draft')]}"
+                                               domain="[('type','=','service')]"/>
+                                    </group>
+                                    <group>
+                                        <field name="picking_policy"
+                                               attrs="{'required':[('state','!=','draft')]}"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"/>
+                                        <field name="invoice_policy"/>
+                                        <field name="pricelist_id"
+                                               attrs="{'required':[('state','!=','draft')]}"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Accounting">
+                                <group>
+                                    <group>
+                                        <field name="journal_id"
+                                               attrs="{'required':[('state','!=','draft')]}"
+                                               options="{'no_create':True,'no_create_edit': True,'no_open': True}"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Automatic Processes">
+                                <div>
+                                    <label for="so_auto_import"></label>
+                                    <field name="so_auto_import"/>
+                                    <div attrs="{'invisible':[('so_auto_import','!=',True)]}">
+                                        <label for="name" string="Import Sale Order At Every"
+                                               class="oe_inline"/>
+                                        <label for="name" string="    "/>
+                                        <field name="so_import_interval_number"
+                                               class="oe_inline"
+                                               attrs="{'required':[('so_auto_import','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <field name="so_import_interval_type" class="oe_inline"
+                                               attrs="{'required':[('so_auto_import','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <label for="name" string="Will Execute On "/>
+                                        <field name="so_import_next_execution" class="oe_inline"
+                                               attrs="{'required':[('so_auto_import','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <label for="name" string="    By "/>
+                                        <field name="so_import_user_id" widget="selection"
+                                               class="oe_inline"
+                                               attrs="{'required':[('so_auto_import','=',True)]}"/>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div>
+                                    <label for="so_auto_update"></label>
+                                    <field name="so_auto_update"/>
+                                    <div attrs="{'invisible':[('so_auto_update','!=',True)]}">
+                                        <label for="name" string="Update Sale Order At Every"
+                                               class="oe_inline"/>
+                                        <label for="name" string="    "/>
+                                        <field name="so_update_interval_number"
+                                               class="oe_inline"
+                                               attrs="{'required':[('so_auto_update','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <field name="so_update_interval_type" class="oe_inline"
+                                               attrs="{'required':[('so_auto_update','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <label for="name" string="Will Execute On "/>
+                                        <field name="so_update_next_execution" class="oe_inline"
+                                               attrs="{'required':[('so_auto_update','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <label for="name" string="    By "/>
+                                        <field name="so_update_user_id" widget="selection"
+                                               class="oe_inline"
+                                               attrs="{'required':[('so_auto_update','=',True)]}"/>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div>
+                                    <label for="stock_auto_update"/>
+                                    <field name="stock_auto_update"/>
+                                    <div
+                                            attrs="{'invisible':[('stock_auto_update','!=',True)]}">
+                                        <label for="name" string="Update Product Stock At Every"
+                                               class="oe_inline"/>
+                                        <label for="name" string="    "/>
+                                        <field name="stock_update_interval_number"
+                                               class="oe_inline"
+                                               attrs="{'required':[('stock_auto_update','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <field name="stock_update_interval_type"
+                                               class="oe_inline"
+                                               attrs="{'required':[('stock_auto_update','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <label for="name" string="Will Execute On "/>
+                                        <field name="stock_update_next_execution"
+                                               class="oe_inline"
+                                               attrs="{'required':[('stock_auto_update','=',True)]}"/>
+                                        <label for="name" string="    "/>
+                                        <label for="name" string="    By "/>
+                                        <field name="stock_update_user_id" widget="selection"
+                                               class="oe_inline"
+                                               attrs="{'required':[('stock_auto_update','=',True)]}"/>
+                                    </div>
+                                </div>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="wc_instance_search_view" model="ir.ui.view">
+            <field name="name">WooCommerce Instance Search View</field>
+            <field name="model">wc.instance.cft</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="WooCommerce Instance">
+                    <field name="name"/>
+                    <group string="Group By">
+                        <filter string="Warehouse" name="warehouse"
+                                context="{'group_by':'warehouse_id'}"/>
+                        <filter string="State" name="store"
+                                context="{'group_by':'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="wc_instance_kanban_view">
+            <field name="name">WooCommerce Instance</field>
+            <field name="model">wc.instance.cft</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_applicant" create="0" edit="0">
+                    <field name="name"/>
+                    <field name="color"/>
+                    <field name="order_count"/>
+                    <field name="product_count"/>
+                    <field name="invoice_count"/>
+                    <field name="delivery_count"/>
+                    <field name="categs_count"/>
+                    <field name="tags_count"/>
+                    <field name="customer_count"/>
+                    <field name="coupon_count"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_content" style="width: 40%;">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_title">
+                                        <h4>
+                                            <b>
+                                                <field name="name"/>
+                                            </b>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div class="row ml-1">
+                                    <div class="col-3">
+                                        <span title="Orders" class="fa fa-shopping-cart"
+                                              style="font-size: 2em;color: cadetblue;"/>
+                                        <div>
+                                            <a name="view_orders" type="object">
+                                                <field name="order_count"/>
+                                                Orders
+                                            </a>
+                                            <br/>
+                                            <a name="import_orders" type="object">Import Orders</a>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                        </div>
+                                        <br/>
+                                        <div>
+                                            <span title="Customers" class="fa fa-user"
+                                                  style="font-size: 2em;color: cadetblue;"/>
+                                            <div>
+                                                <a name="view_customers" type="object">
+                                                    <field name="customer_count"/>
+                                                    Customers
+                                                </a>
+                                                <br/>
+                                                <a name="import_wc_customers" type="object">Sync Customers</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <span title="Invoices" class="fa fa-money"
+                                              style="font-size: 2em;color: cadetblue;"/>
+                                        <div>
+                                            <a name="view_invoices" type="object">
+                                                <field name="invoice_count"/>
+                                                Invoices
+                                            </a>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                        </div>
+                                        <br/>
+                                        <div>
+                                            <span title="Coupons" class="fa fa-ticket"
+                                                  style="font-size: 2em;color: cadetblue;"/>
+                                            <div>
+                                                <a name="view_coupons" type="object">
+                                                    <field name="coupon_count"/>
+                                                    Coupons
+                                                </a>
+                                                <br/>
+                                                <a name="import_wc_coupons" type="object">Sync Coupons</a>
+                                                <br/>
+                                                <a name="export_update_wc_coupons" type="object">Export/Update Coupons
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <span title="Products" class="fa fa-shopping-bag"
+                                              style="font-size: 2em;color: cadetblue;"/>
+                                        <div>
+                                            <a name="view_products" type="object">
+                                                <field name="product_count"/>
+                                                Products
+                                            </a>
+                                            <br/>
+                                            <a name="import_wc_products" type="object">Sync Products</a>
+                                            <br/>
+                                            <a name="export_wc_products" type="object">Export/Update Products</a>
+                                            <br/>
+                                            <a name="import_stock" type="object">Import Product Stock</a>
+                                            <br/>
+                                        </div>
+                                        <br/>
+                                        <div>
+                                            <span title="Category" class="fa fa-list-alt"
+                                                  style="font-size: 2em;color: cadetblue;"/>
+                                            <div>
+                                                <a name="view_category" type="object">
+                                                    <field name="categs_count"/>
+                                                    Category
+                                                </a>
+                                                <br/>
+                                                <a name="import_wc_categs" type="object">Sync Category</a>
+                                                <br/>
+                                                <a name="export_wc_categs" type="object">Export/Update Category</a>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <span title="Delivery" class="fa fa-truck"
+                                              style="font-size: 2em;color: cadetblue;"/>
+                                        <div>
+                                            <a name="view_delivery" type="object">
+                                                <field name="delivery_count"/>
+                                                Delivery
+                                            </a>
+                                            <br/>
+                                            <a name="update_wc_order_status" type="object">Update Order Status</a>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                        </div>
+                                        <br/>
+                                        <div>
+                                            <span title="Tags" class="fa fa-tag"
+                                                  style="font-size: 2em;color: cadetblue;"/>
+                                            <div>
+                                                <a name="view_tags" type="object">
+                                                    <field name="tags_count"/>
+                                                    Tags
+                                                </a>
+                                                <br/>
+                                                <a name="import_wc_tags" type="object">Sync Tags</a>
+                                                <br/>
+                                                <a name="export_wc_tags" type="object">Export/Update Tags</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="action_wc_instance" model="ir.actions.act_window">
+            <field name="name">WooCommerce Instance</field>
+            <field name="res_model">wc.instance.cft</field>
+            <field name="view_id" ref="wc_instance_tree_view"/>
+            <field name="help" type="html">
+                <div>
+                    <p>
+                        <b>There is no any WooCommerce Instance configured yet.</b>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <record id="action_wc_dashboard" model="ir.actions.act_window">
+            <field name="name">WooCommerce Dashboard</field>
+            <field name="res_model">wc.instance.cft</field>
+            <field name="view_mode">kanban</field>
+            <field name="domain">[('state','=','confirm')]</field>
+            <field name="view_id" ref="wc_instance_kanban_view"/>
+            <field name="help" type="html">
+                <div>
+                    <p>
+                        <b>There is no any WooCommerce Instance configured yet.</b>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <menuitem id="wc_main_menu" name="WooCommerce"
+                  sequence="20"
+                  action="action_wc_dashboard" groups="woo_odoo_cft.group_wc"
+                  web_icon="woo_odoo_cft,static/description/icon.png"/>
+        <menuitem id="menu_wc_dashboard" parent="wc_main_menu"
+                  name="Dashboard" sequence="1" action="action_wc_dashboard"
+                  groups="woo_odoo_cft.group_wc"/>
+        <menuitem id="wc_main_configuration" name="Instances"
+                  parent="wc_main_menu" sequence="100"
+                  groups="woo_odoo_cft.group_wc"/>
+        <menuitem id="wc_instances" name="WooCommerce Instances"
+                  action="action_wc_instance"
+                  parent="wc_main_configuration" groups="woo_odoo_cft.group_wc"/>
+    </data>
+</odoo>

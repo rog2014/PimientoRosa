@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        <record id="wc_order_status_tree_view" model="ir.ui.view">
+            <field name="name">WooCommerce Order Status</field>
+            <field name="model">wc.order.status.cft</field>
+            <field name="arch" type="xml">
+                <tree string="WooCommerce Order Status" create="0">
+                    <field name="name"/>
+                    <field name="status"/>
+                    <field name="wc_instance_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="wc_order_status_form_view" model="ir.ui.view">
+            <field name="name">WooCommerce Order Status</field>
+            <field name="model">wc.order.status.cft</field>
+            <field name="arch" type="xml">
+                <form string="WooCommerce Order Status" create="0">
+                    <sheet>
+                        <group>
+                            <group string="Order Status Information">
+                                <field name="status" readonly="1"/>
+                                <field name="name" readonly="1"/>
+                            </group>
+                            <group string="Instance Information">
+                                <field name="wc_instance_id" readonly="1" domain="[('state','=','confirm')]"
+                                       options="{'no_create':True,'no_create_edit': True}"/>
+                            </group>
+                        </group>
+                        <group string="Automatic Workflow">
+                            <field name="validate_order" attrs="{'invisible':[('cancel_order','!=',False)]}"/>
+                            <field name="validate_shipping" attrs="{'invisible':[('validate_order','=',False)]}"/>
+                            <field name="create_invoice" attrs="{'invisible':[('validate_order','=',False)]}"/>
+                            <field name="validate_invoice"
+                                   attrs="{'invisible':['|',('create_invoice','=',False),('validate_order','=',False)]}"/>
+                            <field name="register_payment"
+                                   attrs="{'invisible':['|','|',('create_invoice','=',False),('validate_invoice','=',False),('validate_order','=',False)]}"/>
+                            <field name="cancel_order" attrs="{'invisible':[('validate_order','!=',False)]}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="wc_order_status_search_view" model="ir.ui.view">
+            <field name="name">WooCommerce Order Status</field>
+            <field name="model">wc.order.status.cft</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="WooCommerce Order Status">
+                    <field name="name"/>
+                    <field name="status"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Status" name="status" context="{'group_by':'status'}"/>
+                        <filter string="Instance" name="instance" context="{'group_by':'wc_instance_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_wc_order_status" model="ir.actions.act_window">
+            <field name="name">Order Status</field>
+            <field name="res_model">wc.order.status.cft</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="action_wc_instance_order_status" model="ir.actions.act_window">
+            <field name="name">Order Status</field>
+            <field name="res_model">wc.order.status.cft</field>
+            <field name="domain">[('wc_instance_id','=',active_id)]</field>
+            <field name="view_id" ref="wc_order_status_tree_view"/>
+        </record>
+
+        <menuitem id="wc_order_status_eegs" name="Order Status"
+                  parent="wc_menu_item_sales"
+                  action="action_wc_order_status" sequence="24"/>
+    </data>
+</odoo>
