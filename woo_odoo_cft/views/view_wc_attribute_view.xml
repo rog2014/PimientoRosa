@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_wc_attribute_form_view" model="ir.ui.view">
+            <field name="name">WooCommerce Attribute</field>
+            <field name="model">wc.product.attribute.cft</field>
+            <field name="arch" type="xml">
+                <form string="WooCommerce Attribute" create="false" edit="false">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="attribute_id"/>
+                                <field name="wc_attribute_id" readonly="1"/>
+                                <field name="attribute_type" readonly="1"/>
+                                <field name="avail_in_wc" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="slug"/>
+                                <field name="order_by"/>
+                                <field name="has_archives"/>
+                                <field name="wc_instance_id" domain="[('state','=','confirm')]"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="product_wc_attribute_tree_view" model="ir.ui.view">
+            <field name="name">WooCommerce Attribute</field>
+            <field name="model">wc.product.attribute.cft</field>
+            <field name="arch" type="xml">
+                <tree string="Product Product Categories" create="false">
+                    <field name="name"/>
+                    <field name="attribute_id"/>
+                    <field name="wc_attribute_id"/>
+                    <field name="wc_instance_id"/>
+                    <field name="avail_in_wc"/>
+                </tree>
+            </field>
+        </record>
+        <record id="product_wc_attribute_search_view" model="ir.ui.view">
+            <field name="name">WooCommerce Attribute</field>
+            <field name="model">wc.product.attribute.cft</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="wc_attribute_id"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Instance" name="instance" context="{'group_by':'wc_instance_id'}"/>
+                        <filter string="Sort Order" name="sale_order" context="{'group_by':'order_by'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="product_attribute_action" model="ir.actions.act_window">
+            <field name="name">Product Attribute</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wc.product.attribute.cft</field>
+            <field name="view_mode">tree,form,search</field>
+        </record>
+
+        <menuitem action="product_attribute_action" id="product_attribute_menu" parent="menu_item_parent_wc_products"
+                  sequence="12"/>
+    </data>
+</odoo>

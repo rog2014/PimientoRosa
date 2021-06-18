@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+        <record id="wc_payment_gateway_tree_view" model="ir.ui.view">
+            <field name="name">WooCommerce Payment Gateway</field>
+            <field name="model">wc.payment.gateway.cft</field>
+            <field name="arch" type="xml">
+                <tree string="WooCommerce Payment Gateway">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="journal_id"/>
+                    <field name="wc_instance_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="wc_payment_gateway_form_view" model="ir.ui.view">
+            <field name="name">WooCommerce Payment Gateway</field>
+            <field name="model">wc.payment.gateway.cft</field>
+            <field name="arch" type="xml">
+                <form string="WooCommerce Payment Gateway">
+                    <sheet>
+                        <group>
+                            <group string="Payment Method Information">
+                                <field name="code"/>
+                                <field name="name"/>
+                            </group>
+                            <group string="Instance Information">
+                                <field name="wc_instance_id" domain="[('state','=','confirm')]"
+                                       options="{'no_create':True,'no_create_edit': True}"/>
+                            </group>
+                            <group string="Account Information">
+                                <field name="journal_id" options="{'no_create':True,'no_create_edit': True}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="wc_payment_gateway_search_view" model="ir.ui.view">
+            <field name="name">WooCommerce Payment Gateway</field>
+            <field name="model">wc.payment.gateway.cft</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="WooCommerce Payment Gateway">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Payment Code" name="payment_code" context="{'group_by':'code'}"/>
+                        <filter string="Instance" name="instance" context="{'group_by':'wc_instance_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_wc_payment_gateway" model="ir.actions.act_window">
+            <field name="name">Payment Gateway</field>
+            <field name="res_model">wc.payment.gateway.cft</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <div>
+                    <p>
+                        <b>No WooCommerce Payment Method Details are available right now.</b>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <record id="action_wc_instance_payment_gateway" model="ir.actions.act_window">
+            <field name="name">Payment Gateway</field>
+            <field name="res_model">wc.payment.gateway.cft</field>
+            <field name="domain">[('wc_instance_id','=',active_id)]</field>
+            <field name="view_id" ref="wc_payment_gateway_tree_view"/>
+        </record>
+
+        <menuitem id="wc_payment_gateway" parent="wc_main_menu"
+                  name="Payment" groups="group_wc" sequence="23"/>
+
+        <menuitem id="wc_payment_methods" name="Payment Gateway"
+                  parent="wc_payment_gateway"
+                  action="action_wc_payment_gateway" sequence="24"/>
+    </data>
+</odoo>

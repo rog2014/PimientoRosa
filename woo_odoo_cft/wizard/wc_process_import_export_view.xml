@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_wc_import_export_process_form" model="ir.ui.view">
+            <field name="name">Import/Export Process</field>
+            <field name="model">wc.import.export.process.cft</field>
+            <field name="arch" type="xml">
+                <form string="Import/Export" style="height: 200px">
+                    <div invisible="context.get('process_type') not in ['export_wc_products','import_wc_products']">
+                        <div role="status" class="alert alert-info mb8">Operations will be performed on either selected
+                            product(s) or all
+                            products
+                        </div>
+                    </div>
+                    <group>
+                        <field name='wc_instance_ids' domain="[('state','=','confirm')]" widget="many2many_tags"
+                               options="{'no_create':True,'no_create_edit': True,'no_quick_create': True}"
+                               required="1"/>
+                        <field name="wc_coupon_ids" domain="[('wc_instance_id','in',wc_instance_ids)]"
+                               widget="many2many_tags"
+                               options="{'no_create':True,'no_create_edit': True,'no_quick_create': True}"
+                               invisible="context.get('export_update_wc_coupons',True)"/>
+                        <field name="wc_categ_ids" widget="many2many_tags"
+                               domain="[('wc_instance_id','in',wc_instance_ids)]"
+                               options="{'no_create':True,'no_create_edit': True,'no_quick_create': True}"
+                               invisible="context.get('process_type')!='export_wc_categs'"/>
+                        <field name="wc_tag_ids" widget="many2many_tags"
+                               domain="[('wc_instance_id','in',wc_instance_ids)]"
+                               options="{'no_create':True,'no_create_edit': True,'no_quick_create': True}"
+                               invisible="context.get('process_type')!='export_wc_tags'"/>
+                        <field name="wc_products_ids" widget="many2many_tags"
+                               domain="[('wc_instance_id','in',wc_instance_ids)]"
+                               options="{'no_create':True,'no_create_edit': True,'no_quick_create': True}"
+                               invisible="context.get('process_type') not in ['export_wc_products','import_stock','import_wc_products']"/>
+                        <field name="wc_op"
+                               invisible="context.get('process_type') not in ['export_update_wc_coupons','export_wc_categs','export_wc_tags','export_wc_products']"/>
+                        <field name="sync_images"
+                               invisible="context.get('process_type') not in ['import_wc_categs','import_wc_products']"/>
+                        <field name="sync_price_with_product"
+                               invisible="context.get('process_type') not in ['import_wc_products']"/>
+                        <field name="is_update_image" attrs="{'invisible':[('wc_op','not in',['export','update'])]}"
+                               invisible="context.get('process_type') not in ['export_wc_products','export_wc_categs']"/>
+                        <field name="is_update_stock" attrs="{'invisible':[('wc_op','not in',['export'])]}"
+                               invisible="context.get('process_type') not in ['export_wc_products']"/>
+                        <field name="is_update_price" attrs="{'invisible':[('wc_op','not in',['export'])]}"
+                               invisible="context.get('process_type') not in ['export_wc_products']"/>
+                        <field name="publish" attrs="{'invisible':[('wc_op','not in',['export'])]}"
+                               invisible="context.get('process_type') not in ['export_wc_products']"/>
+                    </group>
+                    <footer>
+                        <button name="prepare_wc_product"
+                                invisible="context.get('process_type')!='prepare_wc_product'"
+                                string="Prepare Products" type="object" class="oe_highlight"/>
+                        <button name="import_wc_product_stock"
+                                invisible="context.get('process_type')!='import_stock'"
+                                string="Import Stock" type="object" class="oe_highlight"/>
+                        <button name="import_wc_sale_orders"
+                                invisible="context.get('process_type')!='import_wc_orders'"
+                                string="Import Orders" type="object" class="oe_highlight"/>
+                        <button name="import_wc_categs"
+                                invisible="context.get('process_type')!='import_wc_categs'"
+                                string="Import Category" type="object" class="oe_highlight"/>
+                        <button name="import_wc_tags"
+                                invisible="context.get('process_type')!='import_wc_tags'"
+                                string="Import Tags" type="object" class="oe_highlight"/>
+                        <button name="update_wc_order_status"
+                                invisible="context.get('process_type')!='update_wc_order_status'"
+                                string="Update Order Status" type="object" class="oe_highlight"/>
+                        <button name="import_wc_customers"
+                                invisible="context.get('process_type')!='import_wc_customers'"
+                                string="Import/Sync Customers" type="object" class="oe_highlight"/>
+                        <button name="import_wc_products"
+                                invisible="context.get('process_type')!='import_wc_products'"
+                                string="Import/Sync Products" type="object" class="oe_highlight"/>
+                        <button name="import_wc_coupons"
+                                invisible="context.get('process_type')!='import_wc_coupons'"
+                                string="Import/Sync Coupons" type="object" class="oe_highlight"/>
+                        <button name="export_wc_coupons"
+                                invisible="context.get('process_type')!='export_update_wc_coupons'"
+                                attrs="{'invisible':[('wc_op','!=','export')]}"
+                                string="Export Coupons" type="object" class="oe_highlight"/>
+                        <button name="update_wc_coupons"
+                                invisible="context.get('process_type')!='export_update_wc_coupons'"
+                                attrs="{'invisible':[('wc_op','!=','update')]}"
+                                string="Update Coupons" type="object" class="oe_highlight"/>
+                        <button name="export_wc_categs"
+                                invisible="context.get('process_type')!='export_wc_categs'"
+                                attrs="{'invisible':[('wc_op','!=','export')]}"
+                                string="Export Category" type="object" class="oe_highlight"/>
+                        <button name="update_wc_categs"
+                                invisible="context.get('process_type')!='export_wc_categs'"
+                                attrs="{'invisible':[('wc_op','!=','update')]}"
+                                string="Update Category" type="object" class="oe_highlight"/>
+                        <button name="export_wc_tags"
+                                invisible="context.get('process_type')!='export_wc_tags'"
+                                attrs="{'invisible':[('wc_op','!=','export')]}"
+                                string="Export Tags" type="object" class="oe_highlight"/>
+                        <button name="update_wc_tags"
+                                invisible="context.get('process_type')!='export_wc_tags'"
+                                attrs="{'invisible':[('wc_op','!=','update')]}"
+                                string="Update Tags" type="object" class="oe_highlight"/>
+                        <button name="export_wc_products"
+                                invisible="context.get('process_type')!='export_wc_products'"
+                                attrs="{'invisible':[('wc_op','!=','export')]}"
+                                string="Export Product" type="object" class="oe_highlight"/>
+                        <button name="update_wc_products"
+                                invisible="context.get('process_type')!='export_wc_products'"
+                                attrs="{'invisible':[('wc_op','!=','update')]}"
+                                string="Update Product" type="object" class="oe_highlight"/>
+                        <button name="update_wc_product_price"
+                                invisible="context.get('process_type')!='export_wc_products'"
+                                attrs="{'invisible':[('wc_op','!=','update_price')]}"
+                                string="Update Product Price" type="object" class="oe_highlight"/>
+                        <button name="update_wc_product_stock"
+                                invisible="context.get('process_type')!='export_wc_products'"
+                                attrs="{'invisible':[('wc_op','!=','update_stock')]}"
+                                string="Update Product Stock" type="object" class="oe_highlight"/>
+                        <button name="update_wc_product_image"
+                                invisible="context.get('process_type')!='export_wc_products'"
+                                attrs="{'invisible':[('wc_op','!=','update_image')]}"
+                                string="Update Product Image" type="object" class="oe_highlight"/>
+                        <button name="publish_wc_products"
+                                invisible="context.get('process_type')!='export_wc_products'"
+                                attrs="{'invisible':[('wc_op','!=','publish')]}"
+                                string="Publish Product" type="object" class="oe_highlight"/>
+                        <button name="unpublish_wc_products"
+                                invisible="context.get('process_type')!='export_wc_products'"
+                                attrs="{'invisible':[('wc_op','!=','unpublish')]}"
+                                string="Unpublish Product" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="oe_highlight" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wizard_wc_prepare_wc_product" model="ir.actions.act_window">
+            <field name="name">Prepare WooCommerce Product</field>
+            <field name="res_model">wc.import.export.process.cft</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="view_wc_import_export_process_form"/>
+            <field name="target">new</field>
+            <field name="context">{'process_type':'prepare_wc_product'}</field>
+            <field name="binding_model_id" ref="model_product_template"/>
+            <field name="binding_view_types">list,form</field>
+        </record>
+    </data>
+</odoo>

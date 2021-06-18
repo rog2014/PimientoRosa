@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_wc_tags_form_view" model="ir.ui.view">
+            <field name="name">WooCommerce Tags</field>
+            <field name="model">wc.tags.cft</field>
+            <field name="arch" type="xml">
+                <form string="WooCommerce Tags">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="wc_instance_id" domain="[('state','=','confirm')]"/>
+                            </group>
+                            <group>
+                                <field name="slug"/>
+                                <field name="avail_in_wc" readonly="1"/>
+                                <field name="wc_tag_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Description">
+                            <field name="description" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="product_wc_tags_tree_view" model="ir.ui.view">
+            <field name="name">WooCommerce Tags</field>
+            <field name="model">wc.tags.cft</field>
+            <field name="arch" type="xml">
+                <tree string="Product Product Categories">
+                    <field name="name"/>
+                    <field name="slug"/>
+                    <field name="wc_instance_id"/>
+                    <field name="avail_in_wc"/>
+                    <field name="wc_tag_id"/>
+                </tree>
+            </field>
+        </record>
+        <record id="product_wc_tags_search_view" model="ir.ui.view">
+            <field name="name">WooCommerce Tags Search View</field>
+            <field name="model">wc.tags.cft</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="wc_tag_id"/>
+                    <filter string="Available in WooCommerce" name="availe_wc"
+                            domain="[('avail_in_wc','=','True')]"/>
+                    <filter string="Not Available in WooCommerce" name="unaval_wc"
+                            domain="[('avail_in_wc','=','False')]"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Instance" name="instance" context="{'group_by':'wc_instance_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="product_tags_action" model="ir.actions.act_window">
+            <field name="name">Product Tags</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wc.tags.cft</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem action="product_tags_action" id="product_tags_menu" parent="menu_item_parent_wc_products"
+                  sequence="10"/>
+    </data>
+</odoo>
